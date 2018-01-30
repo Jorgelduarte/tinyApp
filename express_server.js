@@ -121,9 +121,10 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   if(req.session.user_id) {
     var userId = req.session.user_id;
+    var user = users[userId];
     var result = urlsForUser(userId);
     let templateVars = {
-      user: userId,
+      user: user,
       urls: result
     };
     res.render("urls_index", templateVars);
