@@ -7,13 +7,14 @@
     <header>
         <% include partials/_header %>
     </header>
-<p>A list or table of the URLs and their shortened forms below:</p>
-<% for (key in urls) { %>
-    <li><%= key %></li>
-    <a href="url"> <li><%= urls[key] %></li></a>
-    <form method="POST" action="/urls/<%= key %>/edit"><button type="submit">Edit</button></form>
-    <form method="POST" action="/urls/<%= key %>/delete"><button type="submit">🗑️</button></form>
-<% } %>
-
+    <p>A list or table of the URLs and their shortened forms below:</p>
+    <% for (let shortURL in urls) { %>
+        <ul>
+            <li><a href="/u/<%= shortURL %>"><%= shortURL %></a></li>
+            <li><a href="<%= urls[shortURL].longURL %>"> <%= urls[shortURL].longURL %></a></li>
+        </ul>
+        <form method="GET" action="/urls/<%= shortURL %>"><button type="submit">Edit</button></form>
+        <form method="POST" action="/urls/<%= shortURL %>/delete"><button type="submit">🗑️</button></form>
+    <% } %>
 </body>
 </html>

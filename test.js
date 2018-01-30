@@ -11,14 +11,26 @@ const users = {
     }
 }
 
+for (var x in users){
+    var y = (users[x].id)
+    console.log(y)
+}
+
+for (var x in urlDatabase){
+  var userIdUrl = (urlDatabase[x].id)
+
 // for (var x in users){
 //     var y = (users[x].email)
+//     console.log(y)
 //     if (y === "user2@example.com"){
 //         console.log("xupa")
 //     }
 // }
 
+// var x = users["userRandomID"]["id"]
+// console.log(x)
 
-console.log(Object.values(users))
+//var x = Object.values(users)
+//console.log(x["email"])
 
   
