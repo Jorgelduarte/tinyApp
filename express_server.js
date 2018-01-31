@@ -11,18 +11,7 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
-
-function generateRandomString() {
-  var text = "";
-  var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (var i = 0; i < 6; i++){
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
-}
-
-
+// URL database
 var urlDatabase = {
   b2xVn2: {
     userID: "userRandomID",
@@ -38,86 +27,88 @@ var urlDatabase = {
   }
 };
 
+// user database with bcrypt password and real password as comment. 
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: 'test'
+    password: '$2a$10$1p3n5GRt8xvm0.QfkXPQnuOGLrOuUPV6Xki/fAYGWnwEzyB8MrOp.'
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "$2a$10$pzO8h45b7DV/pvQzzttmF.JW2tL8GEi.KcJq9ptfoeiTzI85E7jfi"
+    //"dishwasher-funk"
   },
   "user3RandomID": {
     id: "user3RandomID",
     email: "user3@example.com",
-    password: "top-music"
+    password: "$2a$10$KBE35tZv5nnnhC0pcTILEuLF53pN9/eXfTsJmf1Y4sdw2/zJPLYvS"
+    //"top-music"
   },
   "user4RandomID": {
     id: "user4RandomID",
     email: "user4@example.com",
-    password: "ferrari25"
+    password: "$2a$10$X9IqRXXMq50ljTlw/ov37OroESOk6oYXnH1ACiJFzV5zuCkxIgnV2"
+    //"ferrari25"
   }
 };
 
+// Generate a aleatory string
+function generateRandomString() {
+  var text = "";
+  var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 6; i++){
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+}
+
+// Return only URLs that belongs to the user
 function urlsForUser(id) {
   var urlsForUser = {};
   for(var key in urlDatabase){
     if(urlDatabase[key].userID === id){
-      var tempObject;
-      tempObject = {
+      var newUrlObject = {
         shortURL: key,
         longURL: urlDatabase[key].longURL
       };
-      urlsForUser[key] = tempObject;
+      urlsForUser[key] = newUrlObject;
     }
   }
   return urlsForUser;
 }
 
-function urlsForAll() {
-  var urlsForAll = {};
-  for(var key in urlDatabase){
-    var tempObject;
-    tempObject = {
-      shortURL: key,
-      longURL: "Private"
-    };
-    urlsForAll[key] = tempObject;
-  }
-  return urlsForAll;
-}
-
+// Authenticate the user with bcrypt password
 function authenticateUser(email, pwd) {
-  var flag = false;
-  var temp = key;
- 
   for(var key in users){
     if (users[key].email === email) {
       var passMatch = bcrypt.compareSync(pwd, users[key].password);
-      if (pwd === users[key].password || passMatch){
-        flag = true;
-        temp = key;
-        break;
+      if (passMatch){
+        return users[key];
       }
+      break;
     }
   }
-  if(flag){
-    return users[key];
-  } else {
-    return false;
-  }
+  return false;
 }
 
+// main page. If logged in redirect to URLS. If not, to login
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if(req.session.user_id) {
+    res.redirect("urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
+// change urlsDatabe to string with json
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+//If the user is logged in rende to urls_index. Otherwise show a error message.
 app.get("/urls", (req, res) => {
   if(req.session.user_id) {
     var userId = req.session.user_id;
@@ -129,14 +120,11 @@ app.get("/urls", (req, res) => {
     };
     res.render("urls_index", templateVars);
   } else {
-    let templateVars = {
-      user: users[req.session["user_id"]],
-      urls: urlsForAll()
-    };
-    res.render("urls_index", templateVars);
+    res.send("Error! You are not logged in !!");
   }
 });
 
+// Allow the user input new URL only if the user is logged in. Otherwise, redirect to login page.
 app.get("/urls/new", (req, res) => {
   if (users[req.session["user_id"]]) {
     res.render("urls_new");
@@ -144,6 +132,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
   }
 });
+
 
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
@@ -198,6 +187,7 @@ app.post("/urls", (req, res) => {
   res.send("Ok");
 });
 
+// Allow delete URLs only if this belongs to the user
 app.post("/urls/:id/delete", (req, res) => {
   var userId = users[req.session.user_id].id;
   var shortURL = req.params.id;
@@ -209,6 +199,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
+// To register a new user. Before, It is checked if there is a the same email. The new password is hashing by bcrypt.
 app.post("/register", (req, res) => {
   var foundemail = false;
   for (var userId in users) {

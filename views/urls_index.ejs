@@ -7,7 +7,8 @@
     <header>
         <% include partials/_header %>
     </header>
-    <p>A list or table of the URLs and their shortened forms below:</p>
+    <h4>A list or table of the URLs and their shortened forms below.</h4>
+    <p><em>The list below belongs to you. <u>If it is empty, you do not have any created URLs.</u></em></p>
     <% for (let shortURL in urls) { %>
         <ul>
             <li><a href="/u/<%= shortURL %>"><%= shortURL %></a></li>

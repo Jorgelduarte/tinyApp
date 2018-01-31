@@ -3,13 +3,12 @@
 
    
     <% if(user){ %>
-        <a href=register>Register</a>
         
         You are logged as: <b><%= user.email %></b>
         <form method="POST" action="/logout">
             <button type='submit'><b>Logout</b></button>
         </form>
-        
+        <p> <a href="/urls/new">Create a new URL</a></p>
     <% } else{ %> 
         <a href="register">Register</a>
         <a href="login">Login</a>
