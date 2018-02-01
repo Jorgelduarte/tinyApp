@@ -6,7 +6,7 @@
 <body>
   <% include partials/_header %>
   <p> <b>= = - - File urls_show.ejs - - = =</b></p>
-  <a href="url"> <li><%= shortURL %>: <%= longURL %></li></a>
+  <a href="<%= longURL %>"> <li><%= shortURL %>: <%= longURL %></li></a>
 
   <form method="POST" action="/urls/<%= shortURL %>">
       <p>

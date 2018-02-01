@@ -133,11 +133,10 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[req.session["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -147,6 +146,16 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL.longURL);
 });
+
+//Create new short urls
+app.post("/urls", (req, res) => {
+  urlDatabase[generateRandomString()] = {
+    userID: users[req.session["user_id"]].id,
+    longURL: req.body.longURL
+  }
+  res.redirect("/urls");
+});
+
 
 app.post("/urls/:id", (req, res) => {
   var userId = users[req.session["user_id"]].id;
